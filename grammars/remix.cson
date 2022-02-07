@@ -1,0 +1,61 @@
+scopeName: 'source.remix'
+fileTypes: [
+    'rmx'
+]
+name: 'Remix'
+limitLineLength: true
+
+patterns: [
+    { include: '#lineComment' }
+    { include: '#blockComment' }
+    { include: '#keywords' }
+    { include: '#literals' }
+    { include: '#string' }
+]
+
+repository:
+    lineComment: {
+        name: 'comment.line.double-slash'
+        match: '//.*$'
+    }
+    blockComment: {
+        begin: '/\\*'
+        end: '\\*/'
+        name: 'comment.block'
+    }
+    keywords:
+        patterns: [
+            {
+                match: "(type|func)"
+                captures:
+                    0: name: 'keyword.control'
+            }
+        ]
+    literals:
+        patterns: [
+            {
+                match: "(false|true)"
+                captures:
+                    0: name: 'keyword.control.literal'
+            }
+        ]
+    string:
+        patterns: [
+            {
+                begin: '"'
+                beginCaptures:
+                    0:
+                        name: 'punctuation.definition.string.begin'
+                end: '"'
+                endCaptures:
+                    0:
+                        name: 'punctuation.definition.string.end'
+                name: 'string.quoted.double'
+                patterns: [
+                    {
+                        match: '\\\\.'
+                        name: 'constant.character.escape'
+                    }
+                ]
+            }
+        ]

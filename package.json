@@ -1,0 +1,16 @@
+{
+  "name": "remix-syntax",
+  "version": "1.0.0",
+  "description": "Syntax highlighting and file support for Remix.",
+  "keywords": [
+    "Remix",
+    "rmx"
+  ],
+
+  "repository": "https://github.com/Moderocky/Remix-Grammar",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {}
+}
