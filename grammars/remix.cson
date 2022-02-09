@@ -5,41 +5,356 @@ fileTypes: [
 name: 'Remix'
 limitLineLength: true
 
+folds: [
+  {
+    type: 'block',
+    start: {type: '":"', index: -1},
+    end: {type: '";"', index: 0}
+  }
+]
+
 patterns: [
-    { include: '#lineComment' }
-    { include: '#blockComment' }
-    { include: '#keywords' }
-    { include: '#literals' }
-    { include: '#string' }
+    { include: '#type_body' }
 ]
 
 repository:
-    lineComment: {
-        name: 'comment.line.double-slash'
-        match: '//.*$'
-    }
-    blockComment: {
-        begin: '/\\*'
-        end: '\\*/'
-        name: 'comment.block'
-    }
     keywords:
         patterns: [
             {
-                match: "(type|func)"
+                match: "(type|trans|func|oper|exit|is|if|new|alloc|cast|dup|pop|swap)"
                 captures:
                     0: name: 'keyword.control'
             }
         ]
-    literals:
+    type_header:
         patterns: [
             {
-                match: "(false|true)"
-                captures:
-                    0: name: 'keyword.control.literal'
+                begin: "(?<=type )(\\w+)\\b"
+                beginCaptures:
+                  0: name: 'meta.type'
+                  1: name: 'entity.name.type.class'
+                end: "(?=:)"
+                patterns: [
+                    { include: '#type_extends' }
+                    { include: '#keywords' }
+                ]
             }
         ]
-    string:
+    type_extends:
+        patterns: [
+            {
+                match: "(?<=is )(\\w+)\\b"
+                captures:
+                  1: name: 'entity.name.type.class'
+            }
+        ]
+    type_body:
+        patterns: [
+            {
+                begin: "type .+?(:)"
+                beginCaptures:
+                  0: patterns: [
+                      { include: '#type_header' }
+                      { include: '#keywords' }
+                  ]
+                  1: name: 'punctuation.section.block.begin'
+                end: ";"
+                endCaptures:
+                    0: name: 'punctuation.section.block.end'
+                patterns: [
+                    { include: '#type_block' }
+                ]
+            }
+        ]
+    type_block:
+        patterns: [
+            { include: '#function_body' }
+            { include: '#field_body' }
+        ]
+    field_body:
+        patterns: [
+            {
+                match: "(trans) ([a-z][A-Za-z0-9_]*) ([a-z][A-Za-z0-9_]*)\\s*(?!:)"
+                captures:
+                    0: name: 'meta.field'
+                    1: name: 'keyword.control'
+                    2: name: 'entity.name.type.class'
+                    3: name: 'entity.name.function.field'
+            }
+            {
+                match: "([a-z][A-Za-z0-9_]*) ([a-z][A-Za-z0-9_]*)\\s*(?!:)"
+                captures:
+                    0: name: 'meta.field'
+                    1: name: 'entity.name.type.class'
+                    2: name: 'entity.name.function.field'
+            }
+        ]
+    function_body:
+        patterns: [
+            {
+                begin: "func .+?(:)"
+                beginCaptures:
+                    0: patterns: [
+                        { include: '#function_header' }
+                        { include: '#keywords' }
+                    ]
+                    1: name: 'punctuation.section.block.begin'
+                end: ";"
+                endCaptures:
+                    0: name: 'punctuation.section.block.end'
+                patterns: [
+                    { include: '#function_block' }
+                ]
+            }
+            {
+                begin: "oper .+?(:)"
+                beginCaptures:
+                    0: patterns: [
+                        { include: '#function_header' }
+                        { include: '#keywords' }
+                    ]
+                    1: name: 'punctuation.section.block.begin'
+                end: ";"
+                endCaptures:
+                    0: name: 'punctuation.section.block.end'
+                patterns: [
+                    { include: '#function_block' }
+                ]
+            }
+        ]
+    function_header:
+        patterns: [
+            {
+                begin: "(?<=func )([A-Za-z0-9_]+)\\b"
+                beginCaptures:
+                    0: name: 'meta.function'
+                    1: name: 'entity.name.function'
+                end: "(?=:)"
+                patterns: [
+                  { include: '#function_parameter' }
+                ]
+            }
+            {
+                begin: "(?<=oper )(New|Add|Sub|Mul|Div|Push|Pull|Equals|Bool|Neg)\\b"
+                beginCaptures:
+                    0: name: 'meta.function'
+                    1: name: 'entity.name.function.operator'
+                end: "(?=:)"
+                patterns: [
+                  { include: '#function_parameter' }
+                ]
+            }
+            {
+                match: "(?<=oper )(And|Or)(?=:)"
+                captures:
+                    0: name: 'meta.function'
+                    1: name: 'entity.name.function.operator'
+            }
+        ]
+    function_parameter:
+        patterns: [
+            {
+                match: "\\b([a-z][A-Za-z0-9_]*) ([a-z][A-Za-z0-9_]*)\\b"
+                captures:
+                    0: name: 'variable.parameter'
+                    1: name: 'entity.name.type.class'
+                    2: name: 'variable.other'
+            }
+        ]
+    function_block:
+        patterns: [
+            { include: '#code' }
+        ]
+    code:
+        patterns: [
+            { include: '#literal_string' }
+            { include: '#literal_number' }
+            { include: '#literal_boolean' }
+            { include: '#code_exit' }
+            { include: '#code_if' }
+            { include: '#code_allocate' }
+            { include: '#code_cast' }
+            { include: '#code_duplicate' }
+            { include: '#code_pop' }
+            { include: '#code_swap' }
+            { include: '#code_member_use' }
+            { include: '#code_operator' }
+            { include: '#code_variable_declare' }
+            { include: '#code_variable_use' }
+        ]
+    code_exit:
+        patterns: [
+            {
+                begin: "exit\\s*(:)"
+                beginCaptures:
+                  0: patterns: [
+                      { include: '#keywords' }
+                  ]
+                  1: name: 'punctuation.section.block.begin'
+                end: ";"
+                endCaptures:
+                    0: name: 'punctuation.section.block.end'
+                patterns: [
+                    { include: '#code' }
+                ]
+            }
+        ]
+    code_if:
+        patterns: [
+            {
+                begin: "(if) (.+)\\s*(:)"
+                beginCaptures:
+                    1: name: 'keyword.control.if'
+                    2: patterns: [
+                        { include: '#code' }
+                    ]
+                    # 2: name: 'variable.other'
+                    3: name: 'punctuation.section.block.begin'
+                end: ";"
+                endCaptures:
+                    0: name: 'punctuation.section.block.end'
+                patterns: [
+                    { include: '#code' }
+                ]
+            }
+        ]
+    code_member_use:
+        patterns: [
+            {
+                begin: '(\\.)([A-Za-z0-9_]+)\\s*(:)'
+                beginCaptures:
+                    1: name: 'punctuation.separator.period'
+                    2: name: 'entity.name.function'
+                    3: name: 'punctuation.section.block.begin'
+                end: ";"
+                endCaptures:
+                    0: name: 'punctuation.section.block.end'
+                patterns: [
+                    { include: '#code' }
+                ]
+            }
+            {
+                match: '(\\.)([A-Za-z0-9_]+)\\b'
+                captures:
+                    1: name: 'punctuation.separator.period'
+                    2: name: 'entity.name.function'
+            }
+        ]
+    code_variable_declare:
+        patterns: [
+            {
+                begin: '\\b(\\w+) (\\w+)\\s*(:)'
+                beginCaptures:
+                    1: name: 'entity.name.type.class'
+                    2: name: 'variable.other'
+                    3: name: 'punctuation.section.block.begin'
+                end: ";"
+                endCaptures:
+                    0: name: 'punctuation.section.block.end'
+                patterns: [
+                    { include: '#code' }
+                ]
+            }
+        ]
+    code_variable_use:
+        patterns: [
+            {
+                match: "\\b(\\w+)\\b"
+                captures:
+                    1: name: 'variable.other'
+            }
+        ]
+    code_allocate:
+        patterns: [
+            {
+                match: "(new|alloc) (\\w+)\\b"
+                captures:
+                    1: name: 'keyword.control'
+                    2: name: 'entity.name.type.class'
+            }
+            {
+                begin: "(new) (\\w+)\\s*(:)"
+                captures:
+                    1: name: 'keyword.control'
+                    2: name: 'entity.name.type.class'
+                    3: name: 'punctuation.section.block.begin'
+                end: ";"
+                endCaptures:
+                    0: name: 'punctuation.section.block.end'
+                patterns: [
+                    { include: '#code' }
+                ]
+            }
+        ]
+    code_cast:
+        patterns: [
+            {
+                match: "(cast) (\\w+)\\b"
+                captures:
+                    1: name: 'keyword.control'
+                    2: name: 'entity.name.type.class'
+            }
+        ]
+    code_duplicate:
+        patterns: [
+            {
+                match: "dup"
+                captures:
+                    0: name: 'keyword.control'
+            }
+        ]
+    code_pop:
+        patterns: [
+            {
+                match: "pop"
+                captures:
+                    0: name: 'keyword.control'
+            }
+        ]
+    code_pop:
+        patterns: [
+            {
+                match: "swap"
+                captures:
+                    0: name: 'keyword.control'
+            }
+        ]
+    code_operator:
+        patterns: [
+            {
+                match: "[+\\-*/<>=?!&|]"
+                captures:
+                    0: name: 'keyword.operator'
+            }
+        ]
+    literal_number:
+        patterns: [
+            {
+                match: '''(?x)
+                  (?<!\\$)
+                  (
+                    \\b[0-9]([0-9_]*[0-9])?\\.\\B(?!\\.)
+                    |
+                    \\b[0-9]([0-9_]*[0-9])?\\.([Ee][+-]?[0-9]([0-9_]*[0-9])?)[FfDd]?\\b
+                    |
+                    \\b[0-9]([0-9_]*[0-9])?\\.([Ee][+-]?[0-9]([0-9_]*[0-9])?)?[FfDd]\\b
+                    |
+                    \\b[0-9]([0-9_]*[0-9])?\\.([0-9]([0-9_]*[0-9])?)([Ee][+-]?[0-9]([0-9_]*[0-9])?)?[FfDd]?\\b
+                    |
+                    (?<!\\.)\\B\\.[0-9]([0-9_]*[0-9])?([Ee][+-]?[0-9]([0-9_]*[0-9])?)?[FfDd]?\\b
+                    |
+                    \\b[0-9]([0-9_]*[0-9])?([Ee][+-]?[0-9]([0-9_]*[0-9])?)[FfDd]?\\b
+                    |
+                    \\b[0-9]([0-9_]*[0-9])?([Ee][+-]?[0-9]([0-9_]*[0-9])?)?[FfDd]\\b
+                    |
+                    \\b(0|[1-9]([0-9_]*[0-9])?)(?!\\.)[Ll]?\\b
+                  )
+                  (?!\\$)
+                '''
+                name: 'constant.numeric.decimal'
+            }
+        ]
+    literal_string:
         patterns: [
             {
                 begin: '"'
@@ -59,3 +374,20 @@ repository:
                 ]
             }
         ]
+    literal_boolean:
+        patterns: [
+            {
+                match: "(false|true)"
+                captures:
+                    0: name: 'constant.language'
+            }
+        ]
+
+    literal_constant: {
+        patterns: [
+            {
+                match: '(this|system)'
+                name: 'variable.language.this'
+            }
+        ]
+    }
