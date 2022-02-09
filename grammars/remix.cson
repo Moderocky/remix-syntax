@@ -6,11 +6,11 @@ name: 'Remix'
 limitLineLength: true
 
 folds: [
-  {
-    type: 'block',
-    start: {type: '":"', index: -1},
-    end: {type: '";"', index: 0}
-  }
+    {
+        type: 'block',
+        start: {type: '":"', index: -1},
+        end: {type: '";"', index: 0}
+    }
 ]
 
 patterns: [
@@ -131,7 +131,7 @@ repository:
                     1: name: 'entity.name.function'
                 end: "(?=:)"
                 patterns: [
-                  { include: '#function_parameter' }
+                    { include: '#function_parameter' }
                 ]
             }
             {
@@ -187,10 +187,10 @@ repository:
             {
                 begin: "exit\\s*(:)"
                 beginCaptures:
-                  0: patterns: [
+                    0: patterns: [
                       { include: '#keywords' }
-                  ]
-                  1: name: 'punctuation.section.block.begin'
+                    ]
+                    1: name: 'punctuation.section.block.begin'
                 end: ";"
                 endCaptures:
                     0: name: 'punctuation.section.block.end'
@@ -359,12 +359,10 @@ repository:
             {
                 begin: '"'
                 beginCaptures:
-                    0:
-                        name: 'punctuation.definition.string.begin'
+                    0: name: 'punctuation.definition.string.begin'
                 end: '"'
                 endCaptures:
-                    0:
-                        name: 'punctuation.definition.string.end'
+                    0: name: 'punctuation.definition.string.end'
                 name: 'string.quoted.double'
                 patterns: [
                     {
