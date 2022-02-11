@@ -1,12 +1,11 @@
 {
   "name": "remix-syntax",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Syntax highlighting and file support for Remix.",
   "keywords": [
     "Remix",
     "rmx"
   ],
-
   "repository": "https://github.com/Moderocky/remix-syntax",
   "license": "MIT",
   "engines": {
