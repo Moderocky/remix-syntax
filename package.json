@@ -7,7 +7,7 @@
     "rmx"
   ],
 
-  "repository": "https://github.com/Moderocky/Remix-Grammar",
+  "repository": "https://github.com/Moderocky/remix-syntax",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
