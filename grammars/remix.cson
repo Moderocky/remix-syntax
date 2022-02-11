@@ -8,8 +8,8 @@ limitLineLength: true
 folds: [
     {
         type: 'block',
-        start: {type: '":"', index: -1},
-        end: {type: '";"', index: 0}
+        start: {type: '"{"', index: 0},
+        end: {type: '"}"', index: 1}
     }
 ]
 
@@ -33,7 +33,7 @@ repository:
                 beginCaptures:
                   0: name: 'meta.type'
                   1: name: 'entity.name.type.class'
-                end: "(?=:)"
+                end: "(?={)"
                 patterns: [
                     { include: '#type_extends' }
                     { include: '#keywords' }
@@ -51,14 +51,14 @@ repository:
     type_body:
         patterns: [
             {
-                begin: "type .+?(:)"
+                begin: "type .+?({)"
                 beginCaptures:
                   0: patterns: [
                       { include: '#type_header' }
                       { include: '#keywords' }
                   ]
                   1: name: 'punctuation.section.block.begin'
-                end: ";"
+                end: "}"
                 endCaptures:
                     0: name: 'punctuation.section.block.end'
                 patterns: [
@@ -74,7 +74,7 @@ repository:
     field_body:
         patterns: [
             {
-                match: "(trans) ([a-z][A-Za-z0-9_]*) ([a-z][A-Za-z0-9_]*)\\s*(?!:)"
+                match: "(trans) ([a-z][A-Za-z0-9_]*) ([a-z][A-Za-z0-9_]*)\\s*(?!{)"
                 captures:
                     0: name: 'meta.field'
                     1: name: 'keyword.control'
@@ -82,7 +82,7 @@ repository:
                     3: name: 'entity.name.function.field'
             }
             {
-                match: "([a-z][A-Za-z0-9_]*) ([a-z][A-Za-z0-9_]*)\\s*(?!:)"
+                match: "([a-z][A-Za-z0-9_]*) ([a-z][A-Za-z0-9_]*)\\s*(?!{)"
                 captures:
                     0: name: 'meta.field'
                     1: name: 'entity.name.type.class'
@@ -92,14 +92,14 @@ repository:
     function_body:
         patterns: [
             {
-                begin: "func .+?(:)"
+                begin: "func .+?({)"
                 beginCaptures:
                     0: patterns: [
                         { include: '#function_header' }
                         { include: '#keywords' }
                     ]
                     1: name: 'punctuation.section.block.begin'
-                end: ";"
+                end: "}"
                 endCaptures:
                     0: name: 'punctuation.section.block.end'
                 patterns: [
@@ -107,14 +107,14 @@ repository:
                 ]
             }
             {
-                begin: "oper .+?(:)"
+                begin: "oper .+?({)"
                 beginCaptures:
                     0: patterns: [
                         { include: '#function_header' }
                         { include: '#keywords' }
                     ]
                     1: name: 'punctuation.section.block.begin'
-                end: ";"
+                end: "}"
                 endCaptures:
                     0: name: 'punctuation.section.block.end'
                 patterns: [
@@ -129,7 +129,7 @@ repository:
                 beginCaptures:
                     0: name: 'meta.function'
                     1: name: 'entity.name.function'
-                end: "(?=:)"
+                end: "(?={)"
                 patterns: [
                     { include: '#function_parameter' }
                 ]
@@ -139,13 +139,13 @@ repository:
                 beginCaptures:
                     0: name: 'meta.function'
                     1: name: 'entity.name.function.operator'
-                end: "(?=:)"
+                end: "(?={)"
                 patterns: [
                   { include: '#function_parameter' }
                 ]
             }
             {
-                match: "(?<=oper )(And|Or)(?=:)"
+                match: "(?<=oper )(And|Or)(?={)"
                 captures:
                     0: name: 'meta.function'
                     1: name: 'entity.name.function.operator'
@@ -170,6 +170,7 @@ repository:
             { include: '#literal_string' }
             { include: '#literal_number' }
             { include: '#literal_boolean' }
+            { include: '#literal_constant' }
             { include: '#code_exit' }
             { include: '#code_if' }
             { include: '#code_allocate' }
@@ -185,13 +186,13 @@ repository:
     code_exit:
         patterns: [
             {
-                begin: "exit\\s*(:)"
+                begin: "exit\\s*({)"
                 beginCaptures:
                     0: patterns: [
                       { include: '#keywords' }
                     ]
                     1: name: 'punctuation.section.block.begin'
-                end: ";"
+                end: "}"
                 endCaptures:
                     0: name: 'punctuation.section.block.end'
                 patterns: [
@@ -202,7 +203,7 @@ repository:
     code_if:
         patterns: [
             {
-                begin: "(if) (.+)\\s*(:)"
+                begin: "(if)( .+)?\\s*({)"
                 beginCaptures:
                     1: name: 'keyword.control.if'
                     2: patterns: [
@@ -210,7 +211,7 @@ repository:
                     ]
                     # 2: name: 'variable.other'
                     3: name: 'punctuation.section.block.begin'
-                end: ";"
+                end: "}"
                 endCaptures:
                     0: name: 'punctuation.section.block.end'
                 patterns: [
@@ -221,12 +222,12 @@ repository:
     code_member_use:
         patterns: [
             {
-                begin: '(\\.)([A-Za-z0-9_]+)\\s*(:)'
+                begin: '(\\.)([A-Za-z0-9_]+)\\s*({)'
                 beginCaptures:
                     1: name: 'punctuation.separator.period'
                     2: name: 'entity.name.function'
                     3: name: 'punctuation.section.block.begin'
-                end: ";"
+                end: "}"
                 endCaptures:
                     0: name: 'punctuation.section.block.end'
                 patterns: [
@@ -243,12 +244,12 @@ repository:
     code_variable_declare:
         patterns: [
             {
-                begin: '\\b(\\w+) (\\w+)\\s*(:)'
+                begin: '\\b(\\w+) (\\w+)\\s*({)'
                 beginCaptures:
                     1: name: 'entity.name.type.class'
                     2: name: 'variable.other'
                     3: name: 'punctuation.section.block.begin'
-                end: ";"
+                end: "}"
                 endCaptures:
                     0: name: 'punctuation.section.block.end'
                 patterns: [
@@ -273,12 +274,12 @@ repository:
                     2: name: 'entity.name.type.class'
             }
             {
-                begin: "(new) (\\w+)\\s*(:)"
+                begin: "(new) (\\w+)\\s*({)"
                 captures:
                     1: name: 'keyword.control'
                     2: name: 'entity.name.type.class'
                     3: name: 'punctuation.section.block.begin'
-                end: ";"
+                end: "}"
                 endCaptures:
                     0: name: 'punctuation.section.block.end'
                 patterns: [
@@ -311,7 +312,7 @@ repository:
                     0: name: 'keyword.control'
             }
         ]
-    code_pop:
+    code_swap:
         patterns: [
             {
                 match: "swap"
@@ -364,11 +365,10 @@ repository:
                     0: name: 'constant.language'
             }
         ]
-
     literal_constant: {
         patterns: [
             {
-                match: '(this|system)'
+                match: '(this|system|top)'
                 name: 'variable.language.this'
             }
         ]
