@@ -14,10 +14,24 @@ folds: [
 ]
 
 patterns: [
+    { include: '#comments' }
     { include: '#type_body' }
 ]
 
 repository:
+    comments: {
+        patterns: [
+            { include: '#comment_line' }
+        ]
+    }
+    comment_line: {
+        patterns: [
+            {
+                match: '<-.*$'
+                name: 'comment.line.arrow'
+            }
+        ]
+    }
     keywords:
         patterns: [
             {
@@ -70,6 +84,7 @@ repository:
         patterns: [
             { include: '#function_body' }
             { include: '#field_body' }
+            { include: '#comments' }
         ]
     field_body:
         patterns: [
@@ -167,12 +182,16 @@ repository:
         ]
     code:
         patterns: [
+            { include: '#comments' }
             { include: '#literal_string' }
             { include: '#literal_number' }
             { include: '#literal_boolean' }
             { include: '#literal_constant' }
             { include: '#code_exit' }
             { include: '#code_if' }
+            { include: '#code_break' }
+            { include: '#code_while' }
+            { include: '#code_for' }
             { include: '#code_allocate' }
             { include: '#code_cast' }
             { include: '#code_duplicate' }
@@ -182,6 +201,7 @@ repository:
             { include: '#code_operator' }
             { include: '#code_variable_declare' }
             { include: '#code_variable_use' }
+            { include: '#code_block' }
         ]
     code_exit:
         patterns: [
@@ -222,23 +242,24 @@ repository:
     code_member_use:
         patterns: [
             {
-                begin: '(\\.)([A-Za-z0-9_]+)\\s*({)'
-                beginCaptures:
+                match: '(\\.|\\$)\\s*([A-Za-z0-9_]+)'
+                captures:
                     1: name: 'punctuation.separator.period'
                     2: name: 'entity.name.function'
-                    3: name: 'punctuation.section.block.begin'
+            }
+        ]
+    code_block:
+        patterns: [
+            {
+                begin: '{'
+                beginCaptures:
+                    0: name: 'punctuation.section.block.begin'
                 end: "}"
                 endCaptures:
                     0: name: 'punctuation.section.block.end'
                 patterns: [
                     { include: '#code' }
                 ]
-            }
-            {
-                match: '(\\.)([A-Za-z0-9_]+)\\b'
-                captures:
-                    1: name: 'punctuation.separator.period'
-                    2: name: 'entity.name.function'
             }
         ]
     code_variable_declare:
@@ -290,7 +311,7 @@ repository:
     code_cast:
         patterns: [
             {
-                match: "(cast) (\\w+)\\b"
+                match: "\\b(cast) (\\w+)\\b"
                 captures:
                     1: name: 'keyword.control'
                     2: name: 'entity.name.type.class'
@@ -299,7 +320,7 @@ repository:
     code_duplicate:
         patterns: [
             {
-                match: "dup"
+                match: "\\bdup\\b"
                 captures:
                     0: name: 'keyword.control'
             }
@@ -307,7 +328,7 @@ repository:
     code_pop:
         patterns: [
             {
-                match: "pop"
+                match: "\\bpop\\b"
                 captures:
                     0: name: 'keyword.control'
             }
@@ -315,7 +336,31 @@ repository:
     code_swap:
         patterns: [
             {
-                match: "swap"
+                match: "\\bswap\\b"
+                captures:
+                    0: name: 'keyword.control'
+            }
+        ]
+    code_for:
+        patterns: [
+            {
+                match: "\\bfor\\b"
+                captures:
+                    0: name: 'keyword.control'
+            }
+        ]
+    code_while:
+        patterns: [
+            {
+                match: "\\bwhile\\b"
+                captures:
+                    0: name: 'keyword.control'
+            }
+        ]
+    code_break:
+        patterns: [
+            {
+                match: "\\bbreak\\b"
                 captures:
                     0: name: 'keyword.control'
             }
@@ -325,7 +370,7 @@ repository:
             {
                 match: "[+\\-*/<>=?!&|]"
                 captures:
-                    0: name: 'keyword.operator'
+                    0: name: 'punctuation.operator'
             }
         ]
     literal_number:
